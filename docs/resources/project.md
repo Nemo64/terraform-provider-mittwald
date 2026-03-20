@@ -36,6 +36,7 @@ resource "mittwald_project" "foobar" {
 
 ### Read-Only
 
+- `default_hostname` (String) The default hostname of the project (e.g. `p-xxxxx.project.space`). Use this as the `hostname` of a `mittwald_virtualhost` resource to manage the project's default virtual host.
 - `default_ips` (List of String) Contains a list of default IP addresses for the project
 - `directories` (Map of String) Contains a map of data directories within the project
 - `id` (String) The generated project ID

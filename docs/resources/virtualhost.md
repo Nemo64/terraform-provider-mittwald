@@ -17,6 +17,19 @@ variable "server_id" {
   type = string
 }
 
+# Manage the project's default virtual host
+resource "mittwald_virtualhost" "default" {
+  hostname   = mittwald_project.foobar.default_hostname
+  project_id = mittwald_project.foobar.id
+
+  paths = {
+    "/" = {
+      app = mittwald_app.foobar.id
+    }
+  }
+}
+
+# Create a custom virtual host
 resource "mittwald_virtualhost" "foobar" {
   hostname   = "test.example"
   project_id = mittwald_project.foobar.id
@@ -49,7 +62,7 @@ resource "mittwald_virtualhost" "foobar" {
 
 ### Required
 
-- `hostname` (String) The desired hostname for the virtualhost.
+- `hostname` (String) The desired hostname for the virtualhost. When set to the project's default hostname (available via `mittwald_project.default_hostname`), this resource will take over and manage the project's default virtual host instead of creating a new one.
 - `paths` (Attributes Map) The desired paths for the virtualhost. (see [below for nested schema](#nestedatt--paths))
 - `project_id` (String) The ID of the project the virtualhost belongs to
 

@@ -43,8 +43,8 @@ func (r *Resource) Schema(_ context.Context, _ resource.SchemaRequest, resp *res
 			"id":         builder.Id(),
 			"project_id": builder.ProjectId(),
 			"hostname": schema.StringAttribute{
-				Description: "The desired hostname for the virtualhost.",
-				Required:    true,
+				MarkdownDescription: "The desired hostname for the virtualhost. When set to the project's default hostname (available via `mittwald_project.default_hostname`), this resource will take over and manage the project's default virtual host instead of creating a new one.",
+				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},

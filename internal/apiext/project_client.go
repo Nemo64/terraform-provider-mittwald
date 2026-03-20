@@ -12,6 +12,7 @@ type ProjectClient interface {
 	projectclientv2.Client
 
 	GetProjectDefaultIPs(context.Context, string) ([]string, error)
+	GetProjectDefaultHostname(context.Context, string) (string, error)
 }
 
 type projectClient struct {
@@ -41,4 +42,21 @@ func (c *projectClient) GetProjectDefaultIPs(ctx context.Context, projectID stri
 	}
 
 	return nil, fmt.Errorf("project %s does not appear to have a default ingress", projectID)
+}
+
+func (c *projectClient) GetProjectDefaultHostname(ctx context.Context, projectID string) (string, error) {
+	ingressesRequest := domainclientv2.ListIngressesRequest{ProjectID: &projectID}
+	ingresses, _, err := c.clientSet.Domain().ListIngresses(ctx, ingressesRequest)
+
+	if err != nil {
+		return "", err
+	}
+
+	for _, ingress := range *ingresses {
+		if ingress.IsDefault {
+			return ingress.Hostname, nil
+		}
+	}
+
+	return "", fmt.Errorf("project %s does not appear to have a default ingress", projectID)
 }

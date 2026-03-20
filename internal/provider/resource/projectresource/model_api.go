@@ -16,9 +16,10 @@ func (m *ResourceModel) Reset() {
 	m.Description = types.StringNull()
 	m.Directories = types.MapNull(types.StringType)
 	m.DefaultIPs = types.ListNull(types.StringType)
+	m.DefaultHostname = types.StringNull()
 }
 
-func (m *ResourceModel) FromAPIModel(ctx context.Context, project *projectv2.Project, ips []string) (res diag.Diagnostics) {
+func (m *ResourceModel) FromAPIModel(ctx context.Context, project *projectv2.Project, ips []string, defaultHostname string) (res diag.Diagnostics) {
 	if project == nil {
 		m.Reset()
 		return
@@ -30,6 +31,7 @@ func (m *ResourceModel) FromAPIModel(ctx context.Context, project *projectv2.Pro
 	m.Directories = providerutil.EmbedDiag(types.MapValueFrom(ctx, types.StringType, project.Directories))(&res)
 	m.ServerID = valueutil.StringPtrOrNull(project.ServerId)
 	m.DefaultIPs = providerutil.EmbedDiag(types.ListValueFrom(ctx, types.StringType, ips))(&res)
+	m.DefaultHostname = types.StringValue(defaultHostname)
 
 	return
 }

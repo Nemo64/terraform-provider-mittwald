@@ -73,6 +73,13 @@ func (r *Resource) Schema(_ context.Context, _ resource.SchemaRequest, resp *res
 					listplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"default_hostname": schema.StringAttribute{
+				Computed:            true,
+				MarkdownDescription: "The default hostname of the project (e.g. `p-xxxxx.project.space`). Use this as the `hostname` of a `mittwald_virtualhost` resource to manage the project's default virtual host.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 		},
 	}
 }
@@ -140,11 +147,16 @@ func (r *Resource) read(ctx context.Context, data *ResourceModel) (res diag.Diag
 		IgnoreNotFound().
 		DoVal(client.GetProjectDefaultIPs(ctx, data.ID.ValueString()))
 
+	defaultHostname := providerutil.
+		Try[string](&res, "error while reading project default hostname").
+		IgnoreNotFound().
+		DoVal(client.GetProjectDefaultHostname(ctx, data.ID.ValueString()))
+
 	if res.HasError() {
 		return
 	}
 
-	res.Append(data.FromAPIModel(ctx, pr, ips)...)
+	res.Append(data.FromAPIModel(ctx, pr, ips, defaultHostname)...)
 
 	return
 }
